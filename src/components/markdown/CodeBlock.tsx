@@ -1,18 +1,17 @@
 'use client';
-import React, { ReactNode, useState, useRef } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { getCookie } from 'cookies-next';
+import 'katex/dist/katex.min.css';
+import { ChevronDown, Copy, Download } from 'lucide-react';
+import { ReactNode, useRef, useState } from 'react';
+import Latex from 'react-latex-next';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { a11yDark, a11yLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
-import { Copy, Download } from 'lucide-react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import 'katex/dist/katex.min.css';
-import Latex from 'react-latex-next';
-import { getCookie } from 'cookies-next';
-import MarkdownBlock from '../MarkdownBlock';
 import { DataTable } from '../data-table';
 import { createColumns } from '../data-table/data-table-columns';
 import Mermaid from './Code/Mermaid';
 import { parseXSVData } from './Code/ParseXSVData';
+import MarkdownBlock from './MarkdownBlock';
 import TabPanel from './TabPanel';
 
 const fileExtensions = {

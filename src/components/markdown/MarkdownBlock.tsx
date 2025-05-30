@@ -1,16 +1,15 @@
 import { ReactNode, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Message } from '../../hooks/z';
+import { DataTable } from '../data-table';
+import { createColumns } from '../data-table/data-table-columns';
 import CodeBlock from './CodeBlock';
 import MarkdownHeading from './Heading';
 import MarkdownImage from './Image';
 import MarkdownLink from './Link';
 import textToMarkdown from './Preprocessor';
-import { DataTable } from './data-table';
-import { createColumns } from './data-table/data-table-columns';
 
-export default function MarkdownBlock({ content, role, createdAt }: Message): ReactNode {
+export default function MarkdownBlock({ content, role, createdAt }: any): ReactNode {
   const renderMessage = (message: string): string => {
     return message
       ? message
