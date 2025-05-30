@@ -1,8 +1,8 @@
 'use client';
 
 import { SidebarPage } from '@/appwrapper/SidebarPage';
-import { EmptyNotifications, Notifications } from '@/interactive/components/Notifications';
 import { useState } from 'react';
+import { EmptyNotifications, Notifications } from '../../components/appwrapper/Notifications';
 
 export const dummyNotifications = [
   {
