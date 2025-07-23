@@ -5,7 +5,8 @@ on:
     branches:
       - main
       - dev
-
+permissions:
+  contents: write
 jobs:
   call-reusable-lint:
     name: Call Reusable Lint Workflow
