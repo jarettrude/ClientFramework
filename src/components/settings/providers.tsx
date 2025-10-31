@@ -78,7 +78,7 @@ export function Providers() {
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: getCookie('jwt'),
+            Authorization: `Bearer ${getCookie('jwt')}`,
           },
         },
       );
