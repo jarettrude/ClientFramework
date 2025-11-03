@@ -1,9 +1,7 @@
-import { ThemeToggle } from '@/components/theme/ThemeToggle';
-import { Button } from '@/components/ui/button';
-
 import { cookies } from 'next/headers';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 export default async function Home() {
   return (
@@ -26,7 +24,7 @@ export default async function Home() {
           </Link>
         </div>
       </header>
-      <main></main>
+      <main />
     </div>
   );
 }

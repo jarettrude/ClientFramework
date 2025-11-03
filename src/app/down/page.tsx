@@ -1,10 +1,10 @@
 'use client';
 
-import { SidebarPage } from '@/appwrapper/SidebarPage';
-import { SidebarInset } from '@/components/ui/sidebar';
 import { getCookie } from 'cookies-next';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { SidebarInset } from '@/components/ui/sidebar';
+import { SidebarPage } from '@/appwrapper/SidebarPage';
 
 export default function BadGateway({}: {}) {
   const [link, setLink] = useState('/');

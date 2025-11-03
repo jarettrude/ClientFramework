@@ -1,16 +1,16 @@
-import { SidebarPage } from '@/appwrapper/SidebarPage';
-import { SidebarContent } from '@/components/appwrapper/src/SidebarContentManager';
 import ProviderSidebar from './[id]/providerSideBar';
 import ProviderInstances from './[id]/providers';
+import { SidebarPage } from '@/appwrapper/SidebarPage';
+import { SidebarContent } from '@/components/appwrapper/src/SidebarContentManager';
 
 export default function TeamPage() {
   return (
     <SidebarPage title='Provider Management'>
       <div className='overflow-x-auto px-4'>
-        <ProviderInstances/>
+        <ProviderInstances />
       </div>
       <SidebarContent title='Provider Instance Details'>
-        <ProviderSidebar/>
+        <ProviderSidebar />
       </SidebarContent>
     </SidebarPage>
   );

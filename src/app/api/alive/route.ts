@@ -1,5 +1,9 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request) {
+declare global {
+  var __RUNTIME_CONFIG__: Record<string, any> | undefined;
+}
+
+export async function GET(request: NextRequest) {
   return NextResponse.json(global.__RUNTIME_CONFIG__ || {});
 }

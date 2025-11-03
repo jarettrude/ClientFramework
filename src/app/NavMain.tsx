@@ -2,6 +2,8 @@
 
 import { ChevronRightIcon } from '@radix-ui/react-icons';
 
+import Link from 'next/link';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useTeam } from '@/auth/hooks/useTeam';
 import { items } from '@/components/auth/src/NavMenu';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -17,8 +19,6 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 export const navItems = items;
 export type Item = {
@@ -85,30 +85,31 @@ export function NavMain() {
                   </CollapsibleTrigger>
                   <CollapsibleContent hidden={!item.items?.length}>
                     <SidebarMenuSub className='pr-0 mr-0'>
-                      {item.items?.map((subItem) =>
-                        subItem.max_role && (!company?.name || company?.my_role > subItem.max_role) ? null : (
-                          <SidebarMenuSubItem key={subItem.title}>
-                            <SidebarMenuSubButton asChild>
-                              <Link
-                                href={
-                                  subItem.queryParams
-                                    ? Object.entries(subItem.queryParams).reduce(
-                                        (url, [key, value]) => url + `${key}=${value}&`,
-                                        subItem.url + '?',
-                                      )
-                                    : subItem.url
-                                }
-                                className={cn('w-full', isSubItemActive(subItem, pathname, queryParams) && 'bg-muted')}
-                              >
-                                <span className='flex items-center gap-2'>
-                                  {subItem.icon && <subItem.icon className='w-4 h-4' />}
-                                  {subItem.max_role && company?.name + ' '}
-                                  {subItem.title}
-                                </span>
-                              </Link>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ),
+                      {item.items?.map(
+                        (subItem: { max_role?: number; title: string; icon?: any; url: string; queryParams?: object }) =>
+                          subItem.max_role && (!company?.name || company?.my_role > subItem.max_role) ? null : (
+                            <SidebarMenuSubItem key={subItem.title}>
+                              <SidebarMenuSubButton asChild>
+                                <Link
+                                  href={
+                                    subItem.queryParams
+                                      ? Object.entries(subItem.queryParams).reduce(
+                                          (url, [key, value]) => url + `${key}=${value}&`,
+                                          subItem.url + '?',
+                                        )
+                                      : subItem.url
+                                  }
+                                  className={cn('w-full', isSubItemActive(subItem, pathname, queryParams) && 'bg-muted')}
+                                >
+                                  <span className='flex items-center gap-2'>
+                                    {subItem.icon && <subItem.icon className='w-4 h-4' />}
+                                    {subItem.max_role && company?.name + ' '}
+                                    {subItem.title}
+                                  </span>
+                                </Link>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          ),
                       )}
                     </SidebarMenuSub>
                   </CollapsibleContent>
@@ -144,7 +145,7 @@ function isActive(item: Item, pathname: string, queryParams: URLSearchParams) {
   }
   return false;
 }
-function isSubItemActive(subItem: Item['items'][0], pathname: string, queryParams: URLSearchParams) {
+function isSubItemActive(subItem: NonNullable<Item['items']>[0], pathname: string, queryParams: URLSearchParams) {
   if (subItem.url !== pathname) {
     return false;
   }

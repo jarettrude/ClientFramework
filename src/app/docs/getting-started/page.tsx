@@ -1,10 +1,10 @@
 'use client';
 
-import { SidebarPage } from '@/appwrapper/SidebarPage';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getCookie } from 'cookies-next';
 import { useEffect, useState } from 'react';
 import { LuBook, LuCommand, LuGraduationCap, LuMic, LuPaperclip, LuThumbsDown, LuThumbsUp } from 'react-icons/lu';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { SidebarPage } from '@/appwrapper/SidebarPage';
 
 export default function GettingStartedPage() {
   const [hasStarted, setHasStarted] = useState(false);

@@ -1,5 +1,5 @@
-import AuthRouter from '@/auth/Router';
 import { Suspense } from 'react';
+import AuthRouter from '@/auth/Router';
 
 // Properly handle params as an async value in Next.js 15
 export default async function UserRouter({ params }: { params: Promise<{ slug?: string[] }> | { slug?: string[] } }) {

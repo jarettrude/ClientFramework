@@ -1,12 +1,12 @@
-import { SidebarPage } from '@/appwrapper/SidebarPage';
-import MarkdownBlock from '@/components/markdown/MarkdownBlock';
 import fs from 'fs';
 import path from 'path';
+import { SidebarPage } from '@/appwrapper/SidebarPage';
+import MarkdownBlock from '@/components/markdown/MarkdownBlock';
 
 // Read privacy policy from a local file
 function getPrivacyPolicy() {
   try {
-    const filePath = path.join(process.cwd(), 'content', 'privacy-policy.md');
+    const filePath = path.join(process.cwd(), 'src', 'content', 'PRIVACY_POLICY.md');
     return fs.readFileSync(filePath, 'utf8');
   } catch (error) {
     console.warn('Error reading privacy policy:', error);
