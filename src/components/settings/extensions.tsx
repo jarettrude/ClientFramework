@@ -134,7 +134,7 @@ export function Extensions() {
         },
         {
           headers: {
-            Authorization: (getCookie('jwt') as string) || '',
+            Authorization: `Bearer ${getCookie('jwt') || ''}`,
           },
         },
       );
@@ -167,7 +167,7 @@ export function Extensions() {
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: (getCookie('jwt') as string) || '',
+            Authorization: `Bearer ${getCookie('jwt') || ''}`,
           },
         },
       );
