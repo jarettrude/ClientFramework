@@ -40,7 +40,7 @@ export const useSocketIOBypass: MiddlewareHook = async (req) => {
   };
 };
 
-export default async function Middleware(req: NextRequest): Promise<NextResponse> {
+export default async function Proxy(req: NextRequest): Promise<NextResponse> {
   log([`MIDDLEWARE INVOKED AT ${req.nextUrl.pathname}`], {
     server: 1,
   });
