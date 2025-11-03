@@ -13,7 +13,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
       {
@@ -41,7 +41,8 @@
     "app/theme.ts",
     "components/jrg/auth/auth.config.js",
     "components/interactive/interactive.config.js",
-    "components/interactive/components/Chat/Activity/Severtities.tsx"
+    "components/interactive/components/Chat/Activity/Severtities.tsx",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }
