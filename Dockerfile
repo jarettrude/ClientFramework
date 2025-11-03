@@ -1,24 +1,34 @@
-FROM node:23-alpine AS builder
+FROM node:22-alpine AS builder
 WORKDIR /client-build
-RUN apk add --no-cache python3 make g++ eudev-dev libusb-dev linux-headers eudev-libs
+
+# Install build dependencies for native modules (sharp, usb, etc.)
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    eudev-dev \
+    libusb-dev \
+    linux-headers \
+    eudev-libs \
+    vips-dev \
+    pkgconfig
+
 COPY package*.json ./
-RUN npm install -g npm@latest 
+RUN npm install -g npm@latest
+
+# Tailwind CSS 4.x and lightningcss architecture-specific packages
+# These are now integrated differently in v4, but we still need platform binaries
 RUN ARCH=$(uname -m) && \
     if [ "$ARCH" = "x86_64" ]; then \
-    npm install lightningcss-linux-x64-musl @tailwindcss/oxide-linux-x64-musl; \
+        npm install --no-save lightningcss-linux-x64-musl @tailwindcss/oxide-linux-x64-musl; \
     elif [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then \
-    npm install lightningcss-linux-arm64-musl @tailwindcss/oxide-linux-arm64-musl; \
+        npm install --no-save lightningcss-linux-arm64-musl @tailwindcss/oxide-linux-arm64-musl; \
     elif [ "$ARCH" = "armv7l" ]; then \
-    npm install lightningcss-linux-arm-musl @tailwindcss/oxide-linux-arm-musl; \
-    elif [ "$ARCH" = "ppc64le" ]; then \
-    npm install lightningcss-linux-ppc64le-musl @tailwindcss/oxide-linux-ppc64le-musl; \
-    elif [ "$ARCH" = "s390x" ]; then \
-    npm install lightningcss-linux-s390x-musl @tailwindcss/oxide-linux-s390x-musl; \
+        npm install --no-save lightningcss-linux-arm-musl @tailwindcss/oxide-linux-arm-musl; \
     else \
-    echo "Unsupported architecture: $ARCH"; \
-    echo "Available packages are for: x86_64, arm64, armv7l, ppc64le, s390x"; \
-    exit 1; \
+        echo "Warning: Unsupported architecture: $ARCH. Continuing with default packages."; \
     fi
+
 RUN npm ci
 COPY . .
 ARG API_URI
@@ -28,10 +38,18 @@ ARG APP_URI
 RUN chmod +x ./env.sh && ./env.sh
 RUN npm run build
 
-FROM node:23-alpine AS runner
+FROM node:22-alpine AS runner
 WORKDIR /client
 ENV NODE_ENV=production
-RUN apk add --no-cache python3 libusb eudev make g++ linux-headers eudev-libs
+
+# Runtime dependencies for native modules
+RUN apk add --no-cache \
+    python3 \
+    libusb \
+    eudev \
+    eudev-libs \
+    vips
+
 COPY package*.json ./
 RUN npm install -g npm@latest && npm ci --omit=dev
 
