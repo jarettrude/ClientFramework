@@ -1,8 +1,8 @@
-import { createGraphQLClient } from '@/auth/hooks/lib';
-import log from '@/next-log/log';
 import useSWR, { SWRResponse } from 'swr';
 import { z } from 'zod';
 import { Provider, ProviderSchema } from './z';
+import log from '@/next-log/log';
+import { createGraphQLClient } from '@/auth/hooks/lib';
 
 // ============================================================================
 // Provider Related Hooks
@@ -51,7 +51,7 @@ export function useProviders(): SWRResponse<Provider[]> {
     async (): Promise<Provider[]> => {
       try {
         const query = ProviderSchema.toGQL('query', 'GetProviders');
-        const response = await client.request<Provider[]>(query);
+        const response = await client.request<{ providers: Provider[] }>(query);
         log(['GQL useProviders() Response', response], {
           client: 3,
         });

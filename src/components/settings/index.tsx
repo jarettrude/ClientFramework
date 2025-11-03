@@ -1,19 +1,21 @@
 'use client';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { Extensions } from './extensions';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Extensions } from '@/interface/Settings/extensions';
-import Training from '@/interface/Settings/training';
+// TODO: Create training component
+// import Training from '@/interface/Settings/training';
 
 const sections = [
-  {
-    name: 'Training',
-    component: <Training isUser />,
-  },
-  {
-    name: 'Training (Admin)',
-    component: <Training isUser={false} />,
-  },
+  // TODO: Uncomment when Training component is created
+  // {
+  //   name: 'Training',
+  //   component: <Training isUser />,
+  // },
+  // {
+  //   name: 'Training (Admin)',
+  //   component: <Training isUser={false} />,
+  // },
   {
     name: 'Extensions',
     component: <Extensions />,

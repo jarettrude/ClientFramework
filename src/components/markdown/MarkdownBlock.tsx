@@ -65,8 +65,6 @@ export default function MarkdownBlock({ content, role, createdAt }: any): ReactN
           <ReactMarkdown
             key={segment.content}
             remarkPlugins={[[remarkGfm]]}
-            className='react-markdown'
-            // disallowedElements={['code']}
             components={{
               h1({ children }) {
                 return <MarkdownHeading tag='h1'>{children}</MarkdownHeading>;
@@ -115,7 +113,7 @@ export default function MarkdownBlock({ content, role, createdAt }: any): ReactN
                 );
               },
               img({ src, alt }) {
-                return <MarkdownImage src={src} alt={alt} />;
+                return <MarkdownImage src={src as string | undefined} alt={alt} />;
               },
             }}
           >

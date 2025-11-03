@@ -2,8 +2,9 @@
 import { Table } from '@tanstack/react-table';
 import { X } from 'lucide-react';
 
-import { AddResident } from '../admin/dialogs/add-resident-dialog';
-import { BatchUpload } from '../admin/dialogs/batch-upload-dialog';
+// TODO: These dialog components are missing - need to be created
+// import { AddResident } from '../admin/dialogs/add-resident-dialog';
+// import { BatchUpload } from '../admin/dialogs/batch-upload-dialog';
 import { DataTableFilter } from './data-table-filter';
 import { DataTableViewOptions } from './data-table-view-options';
 import usePathname from '@/hooks/usePathname';
@@ -18,12 +19,14 @@ export function DataTableToolbar<TData>({ table }: DataTableToolbarProps<TData>)
   const pathname = usePathname();
   return (
     <div className='flex items-center justify-end gap-2 flex-wrap'>
+      {/* TODO: Uncomment when dialog components are created
       {pathname.includes('resident') && (
         <>
           <AddResident />
           <BatchUpload />
         </>
       )}
+      */}
 
       {isFiltered && (
         <Button variant='ghost' onClick={() => table.resetColumnFilters()} className='h-8 px-2 lg:px-3'>

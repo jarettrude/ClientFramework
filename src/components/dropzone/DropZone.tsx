@@ -13,7 +13,7 @@ const DropZone: React.FC<PropsWithChildren<DropZoneProps>> & {
   Active: React.FC<PropsWithChildren>;
 } = ({ children, onUpload, className, ...props }) => {
   const activeChildProvided = Children.toArray(children).some(
-    (child) => React.isValidElement(child) && child.props['data-type'] === 'active-dropzone',
+    (child) => React.isValidElement(child) && (child.props as any)['data-type'] === 'active-dropzone',
   );
 
   return (

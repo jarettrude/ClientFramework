@@ -10,7 +10,8 @@ interface MarkdownHeadingProps {
 export default function MarkdownHeading({ tag, children, className, ...props }: MarkdownHeadingProps): ReactNode {
   let text = '';
   if (React.isValidElement(children)) {
-    text = children.props.children;
+    const childProps = children.props as { children?: string };
+    text = childProps.children || '';
   } else if (typeof children === 'string') {
     text = children;
   }

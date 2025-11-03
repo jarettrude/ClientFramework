@@ -10,7 +10,7 @@ const AccordionContext = createContext<AccordionContextType | undefined>(undefin
 
 type AccordionProps = {
   children: ReactNode;
-  defaultValue?: string;
+  defaultValue?: string | null;
   type?: 'single' | 'multiple';
 };
 
@@ -38,7 +38,9 @@ export const AccordionItem = ({ value, children, className = '' }: AccordionItem
   return (
     <div className={`border-b border-border ${className}`}>
       {React.Children.map(children, (child) =>
-        React.isValidElement(child) ? React.cloneElement(child as React.ReactElement, { parentValue: value }) : child,
+        React.isValidElement(child)
+          ? React.cloneElement(child as React.ReactElement<{ parentValue?: string }>, { parentValue: value })
+          : child,
       )}
     </div>
   );
@@ -52,7 +54,7 @@ type AccordionTriggerProps = {
 
 export const AccordionTrigger = ({ children, className = '', parentValue }: AccordionTriggerProps) => {
   const context = useContext(AccordionContext);
-  const trigger = useRef(null);
+  const trigger = useRef<HTMLDivElement>(null);
   if (!context) {
     throw new Error('AccordionTrigger must be used within an Accordion');
   }

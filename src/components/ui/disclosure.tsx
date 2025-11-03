@@ -90,22 +90,24 @@ export function DisclosureTrigger({ children, className }: { children: React.Rea
   return (
     <>
       {React.Children.map(children, (child) => {
-        return React.isValidElement(child)
-          ? React.cloneElement(child, {
-              onClick: toggle,
-              role: 'button',
-              'aria-expanded': open,
-              tabIndex: 0,
-              onKeyDown: (e: { key: string; preventDefault: () => void }) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  toggle();
-                }
-              },
-              className: cn(className, (child as React.ReactElement).props.className),
-              ...(child as React.ReactElement).props,
-            })
-          : child;
+        if (!React.isValidElement(child)) {
+          return child;
+        }
+        const childElement = child as React.ReactElement<Record<string, unknown>>;
+        return React.cloneElement(childElement, {
+          onClick: toggle,
+          role: 'button',
+          'aria-expanded': open,
+          tabIndex: 0,
+          onKeyDown: (e: React.KeyboardEvent) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              toggle();
+            }
+          },
+          className: cn(className, childElement.props.className as string | undefined),
+          ...childElement.props,
+        });
       })}
     </>
   );

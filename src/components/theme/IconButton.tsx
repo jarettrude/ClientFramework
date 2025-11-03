@@ -1,9 +1,17 @@
 // IconButton.tsx
+import { LucideIcon } from 'lucide-react';
+import { ComponentPropsWithoutRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
-export default function IconButton({ Icon, label, description, ...props }) {
+interface IconButtonProps extends ComponentPropsWithoutRef<typeof Button> {
+  Icon: LucideIcon;
+  label: string;
+  description: string;
+}
+
+export default function IconButton({ Icon, label, description, ...props }: IconButtonProps) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>

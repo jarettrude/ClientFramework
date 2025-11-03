@@ -1,5 +1,10 @@
 'use client';
 
+import axios from 'axios';
+import { getCookie } from 'cookies-next';
+import { Plus, Wrench } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { LuUnlink as Unlink } from 'react-icons/lu';
 import { useTeam } from '@/auth/hooks/useTeam';
 import MarkdownBlock from '@/components/markdown/MarkdownBlock';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -16,27 +21,18 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useProviders } from '@/hooks/useProvider';
-import axios from 'axios';
-import { getCookie } from 'cookies-next';
-import { Plus, Wrench } from 'lucide-react';
-import { useMemo, useState } from 'react';
-import { LuUnlink as Unlink } from 'react-icons/lu';
 
-// Types remain the same
-type Command = {
-  friendly_name: string;
-  description: string;
-  command_name: string;
-  command_args: Record<string, string>;
-  enabled?: boolean;
-  extension_name?: string;
+// Types
+type ProviderSetting = {
+  name: string;
+  value: string;
 };
 
-type Extension = {
-  extension_name: string;
-  description: string;
-  settings: string[];
-  commands: Command[];
+type Provider = {
+  name: string;
+  friendlyName?: string;
+  description?: string;
+  settings: ProviderSetting[];
 };
 
 type ErrorState = {
@@ -52,17 +48,19 @@ interface ExtensionSettings {
 export function Providers() {
   const [settings, setSettings] = useState<Record<string, string>>({});
   const [error, setError] = useState<ErrorState>(null);
-  const agent_name = (getCookie('aginterface-agent') || process.env.NEXT_PUBLIC_AGINTERACTIVE_AGENT) ?? agent;
+  const agent_name = (getCookie('aginterface-agent') || process.env.NEXT_PUBLIC_AGINTERACTIVE_AGENT) ?? 'default-agent';
   const { data: activeCompany } = useTeam();
   const { data: providerData } = useProviders();
 
   // Filter connected providers
   const providers = useMemo(() => {
     // Return empty arrays if no data
+    const connected: Provider[] = [];
+    const available: Provider[] = [];
 
     return {
-      connected: [],
-      available: [],
+      connected,
+      available,
     };
   }, [providerData]);
 
@@ -78,7 +76,7 @@ export function Providers() {
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: getCookie('jwt'),
+            Authorization: (getCookie('jwt') as string) || '',
           },
         },
       );
@@ -100,13 +98,14 @@ export function Providers() {
 
   const handleDisconnect = async (name: string) => {
     const extension = providerData?.find((ext) => ext.name === name);
+    if (!extension) return;
     const emptySettings = extension.settings
-      .filter((setting) => {
+      .filter((setting: ProviderSetting) => {
         return ['API_KEY', 'SECRET', 'PASSWORD', 'TOKEN'].some((keyword) =>
           setting.name.replaceAll('TOKENS', '').includes(keyword),
         );
       })
-      .reduce((acc, setting) => {
+      .reduce((acc: Record<string, string>, setting: ProviderSetting) => {
         return { ...acc, [setting.name]: '' };
       }, {});
     await handleSaveSettings(extension.name, emptySettings);
@@ -163,7 +162,7 @@ export function Providers() {
                       onClick={() => {
                         // Initialize settings with the default values from provider.settings
                         setSettings(
-                          provider.settings.reduce((acc, setting) => {
+                          provider.settings.reduce((acc: Record<string, string>, setting: ProviderSetting) => {
                             acc[setting.name] = setting.value;
                             return acc;
                           }, {}),
@@ -183,7 +182,7 @@ export function Providers() {
                     </DialogHeader>
 
                     <div className='grid gap-4 py-4'>
-                      {provider.settings.map((prov) => (
+                      {provider.settings.map((prov: ProviderSetting) => (
                         <div key={prov.name} className='grid gap-2'>
                           <Label htmlFor={prov.name}>{prov.name}</Label>
                           <Input

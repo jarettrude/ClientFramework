@@ -1,3 +1,6 @@
+import { getCookie, setCookie } from 'cookies-next';
+import { Plus, Power, PowerOff, Unlink, Wrench } from 'lucide-react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import MarkdownBlock from '@/components/markdown/MarkdownBlock';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -12,15 +15,48 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { getCookie, setCookie } from 'cookies-next';
-import { Plus, Power, PowerOff, Unlink, Wrench } from 'lucide-react';
-import { useEffect, useState } from 'react';
 
-const OVERRIDE_EXTENSIONS = {
+type OverrideExtension = {
+  name: string;
+  label: string;
+};
+
+const OVERRIDE_EXTENSIONS: Record<string, OverrideExtension> = {
   'text-to-speech': { name: 'tts', label: 'Text to Speech' },
   'web-search': { name: 'websearch', label: 'Web Search' },
   'image-generation': { name: 'create-image', label: 'Image Generation' },
   analysis: { name: 'analyze-user-input', label: 'File Analysis' },
+};
+
+type ExtensionType = {
+  extension_name: string;
+  friendly_name?: string;
+  description?: string;
+  settings: string[];
+  commands?: Array<{
+    friendly_name: string;
+    description: string;
+    command_name: string;
+    command_args: Record<string, string>;
+    enabled?: boolean;
+    extension_name?: string;
+  }>;
+};
+
+type ErrorState = {
+  type: 'success' | 'error';
+  message: string;
+} | null;
+
+type ExtensionProps = {
+  extension: ExtensionType;
+  connected: boolean;
+  onDisconnect: (extension: ExtensionType) => void;
+  onConnect: (extensionName: string, settings: Record<string, string>) => void;
+  settings?: Record<string, string>;
+  setSettings: Dispatch<SetStateAction<Record<string, string>>>;
+  error: ErrorState;
+  setSelectedExtension?: (extensionName: string) => void;
 };
 
 export default function Extension({
@@ -32,7 +68,7 @@ export default function Extension({
   setSettings,
   error,
   setSelectedExtension = () => {},
-}) {
+}: ExtensionProps) {
   const [state, setState] = useState(false);
 
   useEffect(() => {

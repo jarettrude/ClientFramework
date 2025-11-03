@@ -14,7 +14,7 @@ interface Filter {
   value: string;
 }
 
-export function DataTableFilter<TData>({ table }: { table: Table<TData> }): JSX.Element {
+export function DataTableFilter<TData>({ table }: { table: Table<TData> }) {
   const columns = table.getAllColumns().filter((col) => col.getCanFilter());
   const [filter, setFilter] = useState<Filter>({
     column: '',

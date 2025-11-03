@@ -1,5 +1,10 @@
 'use client';
 
+import axios from 'axios';
+import { getCookie } from 'cookies-next';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
+import Extension from './extension';
 import { ConnectedServices } from '@/auth/management/ConnectedServices';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,11 +12,6 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useProviders } from '@/hooks/useProvider';
-import axios from 'axios';
-import { getCookie } from 'cookies-next';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
-import Extension from './extension';
 
 import { useTeam } from '@/auth/hooks/useTeam';
 import MarkdownBlock from '@/components/markdown/MarkdownBlock';
@@ -29,9 +29,10 @@ type Command = {
 
 type Extension = {
   extension_name: string;
-  description: string;
+  description?: string;
   settings: string[];
-  commands: Command[];
+  commands?: Command[];
+  friendly_name?: string;
 };
 
 type ErrorState = {
@@ -44,42 +45,58 @@ interface ExtensionSettings {
   settings: Record<string, string>;
 }
 
+type AgentData = {
+  extensions?: Extension[];
+  settings?: Record<string, string>;
+};
+
+type CompanyData = {
+  extensions?: Extension[];
+  settings?: Record<string, string>;
+  id?: string;
+  my_role?: number;
+};
+
 export function Extensions() {
   const pathname = usePathname();
-  const { data: agentData, mutate: mutateAgent } = null;
+  const agentData = null as AgentData | null;
+  const mutateAgent = () => {};
   const [searchText, setSearchText] = useState('');
   const router = useRouter();
   const [settings, setSettings] = useState<Record<string, string>>({});
   const [error, setError] = useState<ErrorState>(null);
   const [showEnabledOnly, setShowEnabledOnly] = useState(false);
-  const agent_name = (getCookie('aginteractive-agent') || process.env.NEXT_PUBLIC_AGINTERACTIVE_AGENT) ?? agent;
-  const { data: activeCompany, mutate: mutateCompany } = useTeam();
+  const agent_name = (getCookie('aginteractive-agent') || process.env.NEXT_PUBLIC_AGINTERACTIVE_AGENT) ?? 'default-agent';
+  const teamHook = useTeam();
+  const activeCompany = teamHook.data as CompanyData | null;
+  const mutateCompany = teamHook.mutate;
 
   const { data: providerData } = useProviders();
   const searchParams = useSearchParams();
   // Filter extensions for the enabled commands view
-  const extensions = searchParams.get('mode') === 'company' ? activeCompany?.extensions || [] : agentData?.extensions || [];
-  const extensionsWithCommands = extensions.filter((ext) => ext.commands?.length > 0);
+  const extensions: Extension[] =
+    searchParams.get('mode') === 'company' ? (activeCompany?.extensions ?? []) : (agentData?.extensions ?? []);
+  const extensionsWithCommands = extensions.filter((ext) => (ext.commands?.length ?? 0) > 0);
   const allEnabledCommands = extensions.flatMap((ext) =>
-    ext.commands.filter((cmd) => cmd.enabled).map((cmd) => ({ ...cmd, extension_name: ext.extension_name })),
+    (ext.commands ?? []).filter((cmd) => cmd.enabled).map((cmd) => ({ ...cmd, extension_name: ext.extension_name })),
   );
   // Categorize extensions for the available tab
   const categorizeExtensions = (exts: Extension[]) => {
     return {
       // Connected extensions are those with settings and at least one command
       connectedExtensions: filterExtensions(
-        exts.filter((ext) => ext.settings?.length > 0 && ext.commands?.length > 0),
+        exts.filter((ext) => ext.settings?.length > 0 && (ext.commands?.length ?? 0) > 0),
         searchText,
       ),
       // Available extensions are those with settings that aren't connected yet
       availableExtensions: filterExtensions(
-        exts.filter((ext) => ext.settings?.length > 0 && !ext.commands?.length),
+        exts.filter((ext) => ext.settings?.length > 0 && !(ext.commands?.length ?? 0)),
         searchText,
       ),
     };
   };
   // Categorize extensions for the available tab
-  const categorizeProviders = (providers: any[]) => {
+  const categorizeProviders = (providers: Array<{ settings?: Record<string, unknown> }>) => {
     const connected = providers.filter(
       (provider) =>
         provider.settings &&
@@ -87,8 +104,8 @@ export function Extensions() {
           ([key, defaultValue]) =>
             !['KEY', 'SECRET', 'PASSWORD', 'TOKEN'].some((this_key) => key.endsWith(this_key)) ||
             (['KEY', 'SECRET', 'PASSWORD', 'TOKEN'].some((this_key) => key.endsWith(this_key)) &&
-              agentData?.settings[key] &&
-              agentData?.settings[key] === 'HIDDEN'),
+              agentData?.settings?.[key] &&
+              agentData?.settings?.[key] === 'HIDDEN'),
         ),
     );
     return agentData && agentData.settings
@@ -117,7 +134,7 @@ export function Extensions() {
         },
         {
           headers: {
-            Authorization: getCookie('jwt'),
+            Authorization: (getCookie('jwt') as string) || '',
           },
         },
       );
@@ -150,7 +167,7 @@ export function Extensions() {
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: getCookie('jwt'),
+            Authorization: (getCookie('jwt') as string) || '',
           },
         },
       );
@@ -175,17 +192,17 @@ export function Extensions() {
     await handleSaveSettings(extension.extension_name, emptySettings);
   };
 
-  function filterExtensions(extensions, text) {
+  function filterExtensions(extensions: Extension[], text: string) {
     return text
       ? extensions
       : extensions.filter(
           (ext) =>
             ext.extension_name.toLowerCase().includes(text.toLowerCase()) ||
-            ext.description.toLowerCase().includes(text.toLowerCase()),
+            (ext.description ?? '').toLowerCase().includes(text.toLowerCase()),
         );
   }
   const filterCommands = useCallback(
-    (commands) => {
+    (commands: Command[]) => {
       return searchText
         ? commands
         : commands.filter(
@@ -202,7 +219,7 @@ export function Extensions() {
     }
   }, [searchParams]);
   const { connectedExtensions, availableExtensions } = categorizeExtensions(extensions);
-  const { connectedProviders, availableProviders } = categorizeProviders(Object.values(providerData));
+  const { connectedProviders, availableProviders } = categorizeProviders(Object.values(providerData || {}));
   return (
     <div className='space-y-6'>
       <Tabs defaultValue={searchParams.get('tab') || 'extensions'} className='space-y-4'>
@@ -263,7 +280,7 @@ export function Extensions() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className='space-y-4'>
-                      {extension.commands
+                      {(extension.commands ?? [])
                         .filter((command) =>
                           [command.command_name, command.extension_name, command.friendly_name, command.description].some(
                             (value) => value?.toLowerCase().includes(searchText.toLowerCase()),

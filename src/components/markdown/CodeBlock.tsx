@@ -4,7 +4,7 @@ import { getCookie } from 'cookies-next';
 import 'katex/dist/katex.min.css';
 import { ChevronDown, Copy, Download } from 'lucide-react';
 import { ReactNode, useRef, useState } from 'react';
-import Latex from 'react-latex-next';
+import Latex from 'react-latex-modern';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { a11yDark, a11yLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { DataTable } from '../data-table';
@@ -79,10 +79,10 @@ const fileExtensions = {
   latex: 'latex',
 };
 
-const languageRenders = {
-  markdown: (content) => <MarkdownBlock content={content} />,
-  html: (content) => <div dangerouslySetInnerHTML={{ __html: content }} />,
-  csv: (content, setLoading) => {
+const languageRenders: Record<string, (content: any, setLoading?: any) => any> = {
+  markdown: (content: any) => <MarkdownBlock content={content} />,
+  html: (content: any) => <div dangerouslySetInnerHTML={{ __html: content }} />,
+  csv: (content: any, setLoading: any) => {
     const csvData = (
       content.constructor === Array
         ? content.length > 1
@@ -90,11 +90,11 @@ const languageRenders = {
           : content[0]
         : content
             .split('\n')
-            .filter((row) => row.trim())
-            .map((row) => row.trim())
+            .filter((row: string) => row.trim())
+            .map((row: string) => row.trim())
     )
-      .filter((row) => row.trim())
-      .map((row) => row.trim());
+      .filter((row: string) => row.trim())
+      .map((row: string) => row.trim());
 
     const result = parseXSVData(csvData, ',');
 
@@ -104,10 +104,10 @@ const languageRenders = {
 
     return <DataTable columns={createColumns(result.columns)} data={result.rows} />;
   },
-  tsv: (content, setLoading) => {
+  tsv: (content: any, setLoading: any) => {
     const tsvData = (content.constructor === Array ? (content.length > 1 ? content : content[0]) : content.split('\n'))
-      .filter((row) => row.trim())
-      .map((row) => row.trim());
+      .filter((row: string) => row.trim())
+      .map((row: string) => row.trim());
 
     const result = parseXSVData(tsvData, '\t');
 
@@ -117,11 +117,11 @@ const languageRenders = {
 
     return <DataTable columns={createColumns(result.columns)} data={result.rows} />;
   },
-  gantt: (content) => <Mermaid chart={'gantt\n' + content} />,
-  sequence: (content) => <Mermaid chart={'sequenceDiagram\n' + content} />,
-  flow: (content) => <Mermaid chart={'flowchart TD\n' + content} />,
-  mermaid: (content) => <Mermaid chart={content} />,
-  latex: (content) => <Latex>{content[0]}</Latex>,
+  gantt: (content: any) => <Mermaid chart={'gantt\n' + content} />,
+  sequence: (content: any) => <Mermaid chart={'sequenceDiagram\n' + content} />,
+  flow: (content: any) => <Mermaid chart={'flowchart TD\n' + content} />,
+  mermaid: (content: any) => <Mermaid chart={content} />,
+  latex: (content: any) => <Latex>{content[0]}</Latex>,
 };
 
 export type CodeBlockProps = {
@@ -150,14 +150,14 @@ export default function CodeBlock({
 
   if (!language || language === 'Text') {
     const languages = Object.entries(fileExtensions).flat();
-    const potentialLanguage = children.split('\n')[0].trim();
+    const potentialLanguage = (children || '').split('\n')[0].trim();
     if (languages.includes(potentialLanguage)) {
       language = potentialLanguage;
-      children = children.substring(children.indexOf('\n') + 1);
+      children = (children || '').substring((children || '').indexOf('\n') + 1);
     }
   }
 
-  const fileNameWithExtension = `${fileName || 'code'}.${fileExtensions[String(language.toLowerCase())] || 'txt'}`;
+  const fileNameWithExtension = `${fileName || 'code'}.${(fileExtensions as any)[String(language?.toLowerCase())] || 'txt'}`;
 
   const copyCode = () => {
     if (codeBlockRef.current) {
@@ -228,11 +228,11 @@ export default function CodeBlock({
               <SyntaxHighlighter
                 {...props}
                 language={language.toLowerCase()}
-                style={getCookie('theme')?.includes('dark') ? a11yDark : a11yLight}
+                style={String(getCookie('theme') || '').includes('dark') ? a11yDark : a11yLight}
                 showLineNumbers
                 wrapLongLines
               >
-                {children}
+                {children || ''}
               </SyntaxHighlighter>
             ) : (
               <code className='code-block' {...props}>

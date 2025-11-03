@@ -1,8 +1,8 @@
 'use client';
 
-import { ReactNode, useContext, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { LuLightbulb as LightBulbIcon } from 'react-icons/lu';
-import { InteractiveConfigContext } from '../../@/interactiveConfigContext';
+// import { InteractiveConfigContext } from '../../@/interactiveConfigContext';
 
 interface Column {
   field: string;
@@ -35,7 +35,7 @@ export const RendererXSV = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
 
-  const context = useContext(InteractiveConfigContext);
+  const context: any = null; // useContext(InteractiveConfigContext);
 
   useEffect(() => {
     if (!xsvData) {
@@ -92,6 +92,7 @@ export const RendererXSV = ({
   }, [columns]);
 
   const getInsights = async (userMessage: string): Promise<void> => {
+    if (!setLoading || !context) return;
     setLoading(true);
     const stringifiedColumns = filteredColumns.map((header) => header.field);
     const stringifiedRows = filteredRows.map((row) =>
