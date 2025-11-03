@@ -2,19 +2,12 @@ import path from 'path';
 
 const config = {
   stories: ['../src/**/*.stories.@(js|jsx|mjs|ts|tsx|mdx)'],
-  addons: [
-    '@storybook/addon-links',
-    '@storybook/addon-essentials',
-    '@storybook/addon-interactions',
-    '@storybook/addon-docs',
-    'msw-storybook-addon',
-  ],
+  addons: ['@storybook/addon-links', '@storybook/addon-docs', 'msw-storybook-addon'],
   framework: {
     name: '@storybook/nextjs',
     options: {},
   },
   docs: {
-    autodocs: 'tag',
     defaultName: 'Documentation',
   },
   staticDirs: ['../public'],

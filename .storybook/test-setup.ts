@@ -2,7 +2,7 @@
  * This file sets up the necessary global mocks for Storybook
  */
 
-import { vi } from '@storybook/test';
+import { vi } from 'storybook/test';
 
 // Create global Jest-compatible mocks
 global.jest = {
