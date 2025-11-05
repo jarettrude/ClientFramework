@@ -11,24 +11,11 @@ RUN apk add --no-cache \
     linux-headers \
     eudev-libs \
     vips-dev \
-    pkgconfig
+    pkgconfig \
+    cargo
 
 COPY package*.json ./
 RUN npm install -g npm@latest
-
-# Tailwind CSS 4.x and lightningcss architecture-specific packages
-# These are now integrated differently in v4, but we still need platform binaries
-RUN ARCH=$(uname -m) && \
-    if [ "$ARCH" = "x86_64" ]; then \
-        npm install --no-save lightningcss-linux-x64-musl @tailwindcss/oxide-linux-x64-musl; \
-    elif [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then \
-        npm install --no-save lightningcss-linux-arm64-musl @tailwindcss/oxide-linux-arm64-musl; \
-    elif [ "$ARCH" = "armv7l" ]; then \
-        npm install --no-save lightningcss-linux-arm-musl @tailwindcss/oxide-linux-arm-musl; \
-    else \
-        echo "Warning: Unsupported architecture: $ARCH. Continuing with default packages."; \
-    fi
-
 RUN npm ci
 COPY . .
 ARG API_URI
